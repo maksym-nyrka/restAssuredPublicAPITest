@@ -16,13 +16,13 @@ import static io.restassured.RestAssured.*;
 
 public class RestTest {
 
-    @Test
-    public void getUsers() {
+    @Test(priority = 2)
+    public void readUsers() {
         when().get("https://gorest.co.in/public-api/users")
                 .then().log().body().statusCode(200);
     }
 
-    @Test(dataProvider = "usersProvider")
+    @Test(dataProvider = "usersProvider", priority = 1)
     public void createUser(UserPojo user) throws JsonProcessingException {
         RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter());
 
@@ -41,7 +41,7 @@ public class RestTest {
 
     }
 
-    @Test(dataProvider = "usersProvider")
+    @Test(dataProvider = "usersProvider", priority = 3)
     public void updateUser(UserPojo user) throws JsonProcessingException {
         user.setStatus("Disabled");
 
@@ -60,7 +60,7 @@ public class RestTest {
 
     }
 
-    @Test
+    @Test(priority = 4)
     public void deleteUser() {
         RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter());
 
@@ -68,7 +68,7 @@ public class RestTest {
                 .header("Authorization",
                         "Bearer a2d62ecfe2b61dd4efa5e017f2ab587c0ff4a2a4c26c6a70d7696a7c56c637dc")
                 .when()
-                .delete("https://gorest.co.in/public-api/users/1")
+                .delete("https://gorest.co.in/public-api/users/9")
 
                 .then().statusCode(200);
 
