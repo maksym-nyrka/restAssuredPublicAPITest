@@ -8,6 +8,7 @@ import io.restassured.RestAssured;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.http.ContentType;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import pojos.UserPojo;
 
@@ -21,13 +22,12 @@ public class RestTest {
                 .then().log().body().statusCode(200);
     }
 
-    @Test
-    public void createUser() throws JsonProcessingException {
+    @Test(dataProvider = "usersProvider")
+    public void createUser(UserPojo user) throws JsonProcessingException {
         RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter());
 
-        UserPojo userPojo = new UserPojo("Maksym Nyrka", "maksym.nyrka@example.com", "Male", "Active");
         ObjectMapper mapper = new ObjectMapper();
-        String jsonString = mapper.writeValueAsString(userPojo);
+        String jsonString = mapper.writeValueAsString(user);
 
         given()
                 .header("Content-Type", ContentType.JSON)
@@ -41,11 +41,12 @@ public class RestTest {
 
     }
 
-    @Test
-    public void updateUser() throws JsonProcessingException {
-        UserPojo userPojo = new UserPojo("User Not Found", "404@error.com", "Male", "Active");
+    @Test(dataProvider = "usersProvider")
+    public void updateUser(UserPojo user) throws JsonProcessingException {
+        user.setStatus("Disabled");
+
         ObjectMapper mapper = new ObjectMapper();
-        String jsonString = mapper.writeValueAsString(userPojo);
+        String jsonString = mapper.writeValueAsString(user);
 
         given()
                 .header("Content-Type", ContentType.JSON)
@@ -71,5 +72,14 @@ public class RestTest {
 
                 .then().statusCode(200);
 
+    }
+
+    @DataProvider(name = "usersProvider")
+    public Object[][] getUserPojos() {
+        return new Object[][]{
+                {new UserPojo("Maksym Nyrka", "maksym.nyrka@example.com", "Male", "Active")},
+                {new UserPojo("Other Guy", "other.guy@example.com", "Male", "Active")},
+                {new UserPojo("And Another", "and.another@example.com", "Female", "Active")}
+        };
     }
 }
