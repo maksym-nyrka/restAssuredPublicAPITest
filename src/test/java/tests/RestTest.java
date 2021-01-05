@@ -41,11 +41,12 @@ public class RestTest {
 
     }
 
-    @Test
-    public void updateUser() throws JsonProcessingException {
-        UserPojo userPojo = new UserPojo("User Not Found", "404@error.com", "Male", "Active");
+    @Test(dataProvider = "usersProvider")
+    public void updateUser(UserPojo user) throws JsonProcessingException {
+        user.setStatus("Disabled");
+
         ObjectMapper mapper = new ObjectMapper();
-        String jsonString = mapper.writeValueAsString(userPojo);
+        String jsonString = mapper.writeValueAsString(user);
 
         given()
                 .header("Content-Type", ContentType.JSON)
